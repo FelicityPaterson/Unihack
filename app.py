@@ -9,6 +9,12 @@ import re
 from contextlib import nullcontext
 from pyzbar import pyzbar
 from cv2 import cv2
+from twilio.rest import Client
+
+
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+client = Client(account_sid, auth_token)
 
 barcode_number = -1
 url = "https://au.openfoodfacts.org/cgi/search.pl?search_terms="
@@ -25,6 +31,18 @@ with open("food.json", "r") as read_file:
     data = json.load(read_file)
 food = data
 
+
+def send_sms(food, storage, date):
+
+    message = client.messages \
+    .create(
+         body=f'The {food} in your {storage} has a best before of {date}.' + \
+               '\nCheck out the app to see what recipes you can cook with it.',
+         from_='+19034803993',
+         to='+61435735171'
+     )
+
+    print(message.sid)
 
 
 def get_rcp_from_page(soup, links_ls):
@@ -263,13 +281,6 @@ def runRecipeScraper():
         else:
             all_recipes.append(recipe)
 
-    # for link in recipe_links:
-    #     recipe = read_recipe(link)
-    #     if recipe == None:
-    #         continue
-    #     else:
-    #         all_recipes.append(recipe)
-
         print(len(all_recipes), f"{round(i / 34.58, 2)}%")
         save_to_json(all_recipes, "recipes.json")
 
@@ -391,6 +402,7 @@ def decode(image):
             print(title)
     return image
 
+send_sms('milk', 'fridge', '02/03/2022')
 loopvar = True
 while loopvar == True:
    runRecipeScraper()
