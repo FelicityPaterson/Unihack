@@ -127,8 +127,8 @@ def decode(image):
         print("Type:", obj.type)
         print("Data:", obj.data.decode())
         barcode_number = obj.data.decode()
-        url += str(barcode_number)
-        webpageContent = requests.get(url).text
+        tempurl = url + str(barcode_number)
+        webpageContent = requests.get(tempurl).text
         title = BSoup(webpageContent, "html.parser").title.text
         if title == "Search results - Australia" or title == "Error":
             print("error")
