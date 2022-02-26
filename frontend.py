@@ -3,7 +3,10 @@ import tkinter as tk # import tkinter library
 from tkinter import ttk
 from tkcalendar import Calendar
 
+
 def main():
+    # Main function to start app
+    
     # create a window to ADD INGREDIENTS and view FOOD AT HOME
     global window1
     window1 = tk.Tk()
@@ -34,7 +37,7 @@ def main():
     rbtn1 = tk.Radiobutton(window1, text = "Fresh", font = ("Proxima Nova", 12), var = v1, value = "Fresh", command = chooseFresh)
     rbtn1.place(x = 240, y = 115)
 
-    rbtn2 = tk.Radiobutton(window1, text = "Non-fresh", font = ("Proxima Nova", 12), var = v1, value = "Non-fresh", command = chooseNonFresh) ###
+    rbtn2 = tk.Radiobutton(window1, text = "Packaged", font = ("Proxima Nova", 12), var = v1, value = "Packaged", command = chooseNonFresh) ###
     rbtn2.place(x = 320, y = 115)
 
     rbtn3 = tk.Radiobutton(window1, text = "Leftovers", font = ("Proxima Nova", 12), var = v1, value = "Leftovers", command = chooseLeftover) ###
@@ -74,7 +77,6 @@ def main():
 def chooseFresh(): 
     # Function run when Fresh option of radiobuttons selected. Creates relevant widgets for user input; choose fresh
     # food type and date food is bought. 
-    print("FRESH") ##### TEST
 
     # create fresh food list
     freshFoodList = ["Apple", "Kiwi fruit", "Mango", "Plum", "Bok choy", "Broccoli", "Carrot", "Cucumber", "Potato", "Nut"]
@@ -121,52 +123,45 @@ def chooseFresh():
 
     return
 
-
 def chooseNonFresh():
-    # TO BE CHANGED. Function run when Non-Fresh option of radiobuttons selected. Creates relevant widgets; prompt for 
+    # TO BE CHANGED. Function run when Packaged option of radiobuttons selected. Creates relevant widgets; prompt for 
     # user to scan QR code, location food is stored, and expiry date (?)
 
-    print("NONFRESH") # TEST
-    nonFreshFoodList = ["A", "B", "C"] #########
     nonFreshFoodLocList = ["Fridge", "Pantry", "Freezer"]
 
     #-------------USER INPUT WIDGETS---------------
-    # category
-    NFlb1 = tk.Label(window1, text = "Select non-fresh category:", font = ("Proxima Nova", 12)) # prompt
+    # name
+    NFlb1 = tk.Label(window1, text = "Enter or scan for name:", font = ("Proxima Nova", 12)) # prompt
     NFlb1.place(x = 60, y = 160)
 
-    NFfood = ttk.Combobox(window1, values = nonFreshFoodList, state = "readonly") # menu widget
-    NFfood.place(x = 240, y = 160)
+    NFname = tk.Entry(window1, bd = 3, width = 15) # entry box
+    NFname.place(x = 240, y = 160)
 
-    # name
-    NFlb2 = tk.Label(window1, text = "Enter non-fresh food name:\n(leave blank if not applicable)", font = ("Proxima Nova", 12), justify = "left") # prompt
-    NFlb2.place(x = 60, y = 215)
-
-    NFname = tk.Entry(window1, bd = 3) # entry box
-    NFname.place(x = 240, y = 215)
+    NFscanbtn = tk.Button(window1, text = "Scan", font = ("Proxima Nova", 12), command = scanCode) # scan button. link to scanning function with command = ...
+    NFscanbtn.place(x = 400, y = 165) 
 
     # location #######
-    NFlb3 = tk.Label(window1, text = "Select location stored: ", font = ("Proxima Nova", 12)) # prompt
-    NFlb3.place(x = 60, y = 285)
+    NFlb2 = tk.Label(window1, text = "Select location stored: ", font = ("Proxima Nova", 12)) # prompt
+    NFlb2.place(x = 60, y = 215)
 
     NFloc = ttk.Combobox(window1, values = nonFreshFoodLocList, state = "readonly") # menu widget
-    NFloc.place(x = 240, y = 285)
+    NFloc.place(x = 240, y = 215)
 
     # expiry date
-    NFlb4 = tk.Label(window1, text = "Enter expiry date:", font = ("Proxima Nova", 12)) # prompt
-    NFlb4.place(x = 60, y = 350)
+    NFlb3 = tk.Label(window1, text = "Enter expiry date:", font = ("Proxima Nova", 12)) # prompt
+    NFlb3.place(x = 60, y = 285)
 
     NFexpirydate = Calendar(window1)
-    NFexpirydate.place(x = 240, y = 350)
+    NFexpirydate.place(x = 240, y = 285)
 
     # done button
-    NFdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
+    NFdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) 
     NFdonebtn.place(x = 330, y = 550)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
     # list of non-fresh widgets
     global NFwidgets
-    NFwidgets = [NFname, NFfood, NFloc, NFexpirydate, NFlb1, NFlb2, NFlb3, NFlb4, NFdonebtn]
+    NFwidgets = [NFname, NFloc, NFexpirydate, NFscanbtn, NFlb1, NFlb2, NFlb3, NFdonebtn] ##### 
 
     # hide widgets from other food types
     try:
@@ -187,8 +182,6 @@ def chooseNonFresh():
 def chooseLeftover():
     # Function run when Leftover option of radiobuttons selected. Creates relevant widgets; name to give leftovers
     # and date leftovers were made.
-
-    print("LEFTOVER") # TEST
 
     #-------------USER INPUT WIDGETS---------------
     # entry box to input name for leftovers
@@ -230,12 +223,10 @@ def chooseLeftover():
 
     return
 
-
 def chooseFrozen():
     # Function run when Frozen option of radiobuttons selected. Creates relevant widgets; type of frozen food and
     # date food was first frozen.
 
-    print("FROZEN") # TEST
     frozenFoodList = ["Fish", "Leftovers", "Cold meats", "Ham", "Baked goods", "Lamb", "Chicken", "Mushrooms", "Beef", "Fruit", "Veggies"]
 
     #-------------USER INPUT WIDGETS---------------
@@ -286,7 +277,9 @@ def hideWidget(widgetList):
 
     return
 
-
+def scanCode():
+    # Function to scan code for Packaged food
+    print('SCANNED!')
 
 ##-------------------------WHEN FOOD TYPE IS SELECTED (e.g. Fresh, Non-fresh)---------------------------------------
 def foodInventoryInsert(): #########
@@ -294,12 +287,12 @@ def foodInventoryInsert(): #########
     # best before date, how many dates until it expires
     
     # inventoryList = []
-    # inventoryList.append() #######
+    # inventoryList.append()
 
     if v1.get() == "Fresh":
         tree.insert("", index = "end", values = (FSwidgets[0].get(), "", "")) ######
-    elif v1.get() == "Non-fresh":
-        tree.insert("", index = "end", values = (NFwidgets[0].get(), "", "")) ######### SCANNER INSTEAD
+    elif v1.get() == "Packaged":
+        tree.insert("", index = "end", values = (NFwidgets[0].get(), "", "")) ######### CHANGE TO ACCOMODATE SCANNER TOO
     elif v1.get() == "Leftovers":
         tree.insert("", index = "end", values = (LOwidgets[0].get(), "", "")) ######
     elif v1.get() == "Frozen":
@@ -313,22 +306,27 @@ def foodInventoryInsert(): #########
     findARecipeBtn = tk.Button(window1, text = "Find a recipe!", command = recipepage)
     findARecipeBtn.place(x = 1000, y = 550)
     
-    # for child in tree.get_children(): #######
+    # for child in tree.get_children(): ####### potential way of iterating through items in tree?
     #     print(tree.item(child)["Values"])
     return
 
 def sortBy():
+    # Function to sort entries in tree by food name/best before date/days remaining ######
     pass
 
-
 def delInventoryEntry():
+    # Function to delete entries in tree with 'Delete' button
     tree.delete(tree.selection())
     return
 
+##-------------------------------------------------RECIPE PAGE------------------------------------------------------
+
 def recipepage():
+    # Called when findARecipeBtn is clicked
     window2 = tk.Tk()
     window2.title("Recipe Results")
     window2.geometry("1500x1500")
     window2.mainloop()
+    # ....
 
 main()
