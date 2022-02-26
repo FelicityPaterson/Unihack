@@ -1,20 +1,12 @@
 from contextlib import nullcontext
 from pyzbar import pyzbar
 from cv2 import cv2
-# import requests
+from bs4 import BeautifulSoup as BSoup
+
+import requests
 barcode_number = -1
+url = "https://au.openfoodfacts.org/cgi/search.pl?search_terms="
 
-url = "https://barcode-lookup.p.rapidapi.com/v3/products"
-
-
-# headers = {
-#     'x-rapidapi-host': "barcode-lookup.p.rapidapi.com",
-#     'x-rapidapi-key': "5d899471bbmsh7cab72ee0dc5c50p15121fjsna9ae1c87b523"
-#     }
-
-# response = requests.request("GET", url, headers=headers, params=querystring)
-
-# print(response.text)
 
 
 def draw_barcode(decoded, image):
@@ -28,6 +20,8 @@ def draw_barcode(decoded, image):
     return image
 
 def decode(image):
+    global url
+    global barcode_number
     # decodes all barcodes from an image
     decoded_objects = pyzbar.decode(image)
     for obj in decoded_objects:
@@ -37,17 +31,21 @@ def decode(image):
         print("Type:", obj.type)
         print("Data:", obj.data.decode())
         barcode_number = obj.data.decode()
-        querystring = {"barcode":obj.data}
-
-        print()
-
+        url += str(barcode_number)
+        webpageContent = requests.get(url).text
+        title = BSoup(webpageContent, "html.parser").title.text
+        if title == "Search results - Australia" or title == "Error":
+            print("error")
+        else:
+            print(title)
     return image
+
+
 
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     while barcode_number == -1:
-        print(barcode_number)
         # read the frame from the camera
         _, frame = cap.read()
         # decode detected barcodes & get the image
