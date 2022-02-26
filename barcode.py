@@ -28,6 +28,7 @@ def draw_barcode(decoded, image):
     return image
 
 def decode(image):
+    global barcode_number
     # decodes all barcodes from an image
     decoded_objects = pyzbar.decode(image)
     for obj in decoded_objects:
@@ -45,6 +46,7 @@ def decode(image):
 
 
 if __name__ == "__main__":
+
     cap = cv2.VideoCapture(0)
     while barcode_number == -1:
         print(barcode_number)
