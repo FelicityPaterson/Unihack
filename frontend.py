@@ -2,11 +2,12 @@ from ctypes import alignment
 import tkinter as tk # import tkinter library
 from tkinter import ttk
 from tkcalendar import Calendar
+from PIL import ImageTk, Image
 
 
 def main():
     # Main function to start app
-    
+
     # create a window to ADD INGREDIENTS and view FOOD AT HOME
     global window1
     window1 = tk.Tk()
@@ -14,18 +15,21 @@ def main():
     window1.geometry("1500x1500") # window size
 
     # insert app logo
-    lb1 = tk.Label(window1, text = "BEST BEFORE", font = ("Proxima Nova Bold", 25), fg = "orange") # label
+    logo = Image.open("logo.png")
+    logo = logo.resize((150, 100))
+    logo = ImageTk.PhotoImage(image = logo)
+    lb1 = tk.Label(window1, image = logo) # label
     lb1.place(x = 620, y = 20) # position label
 
 
     #----------------------------------------ADD INGREDIENTS-------------------------------------------------------
     # 'add ingredient' title
-    lb1 = tk.Label(window1, text = "Add food", font = ("Arial Bold", 16), fg = "white", bg = "green") # label
-    lb1.place(x = 200, y = 70) # position label
+    lb1 = tk.Label(window1, text = "Add food", font = ("Arial Bold", 16), fg = "white", bg = "#ABBD5C") # label
+    lb1.place(x = 200, y = 170) # position label
     
     # select ingredient type prompt
     lb1 = tk.Label(window1, text = "Select food type: ", font = ("Proxima Nova", 12, "bold italic"), fg = "black") # label
-    lb1.place(x = 60, y = 115) # position label
+    lb1.place(x = 60, y = 215) # position label
 
 
     # set up widgets for adding ingredient
@@ -35,22 +39,22 @@ def main():
     
     # create produce selection radio buttons
     rbtn1 = tk.Radiobutton(window1, text = "Fresh", font = ("Proxima Nova", 12), var = v1, value = "Fresh", command = chooseFresh)
-    rbtn1.place(x = 240, y = 115)
+    rbtn1.place(x = 240, y = 215)
 
     rbtn2 = tk.Radiobutton(window1, text = "Packaged", font = ("Proxima Nova", 12), var = v1, value = "Packaged", command = chooseNonFresh) ###
-    rbtn2.place(x = 320, y = 115)
+    rbtn2.place(x = 320, y = 215)
 
     rbtn3 = tk.Radiobutton(window1, text = "Leftovers", font = ("Proxima Nova", 12), var = v1, value = "Leftovers", command = chooseLeftover) ###
-    rbtn3.place(x = 420, y = 115)
+    rbtn3.place(x = 420, y = 215)
 
     rbtn4 = tk.Radiobutton(window1, text = "Frozen", font = ("Proxima Nova", 12), var = v1, value = "Frozen", command = chooseFrozen) ###
-    rbtn4.place(x = 510, y = 115)
+    rbtn4.place(x = 510, y = 215)
 
 
     #----------------------------------------TREE INVENTORY-------------------------------------------------------
     # 'View existing food' prompt
-    lb1 = tk.Label(window1, text = "Food at home", font = ("Arial Bold", 16), fg = "white", bg = "green") # label
-    lb1.place(x = 800, y = 70) # position label
+    lb1 = tk.Label(window1, text = "Food at home", font = ("Arial Bold", 16), fg = "white", bg = "#ABBD5C") # label
+    lb1.place(x = 800, y = 170) # position label
 
 
     # define tree inventory
@@ -60,7 +64,7 @@ def main():
     tree.heading("Food", text = "Food", command = sortBy) # set heading names
     tree.heading("Best before", text = "Best before")
     tree.heading("Days remaining", text = "Days remaining")
-    tree.place(x = 750, y = 115) # place tree
+    tree.place(x = 750, y = 215) # place tree
 
     #----------------------------------------RECIPE PAGE-------------------------------------------------------
 
@@ -84,22 +88,22 @@ def chooseFresh():
     #-------------USER INPUT WIDGETS---------------
     # drop-down menu to select fresh food type
     FSlb1 = tk.Label(window1, text = "Select Fresh food:", font = ("Proxima Nova", 12)) # instructions
-    FSlb1.place(x = 60, y = 160)
+    FSlb1.place(x = 60, y = 260)
 
     global FSfood
     FSfood = ttk.Combobox(window1, values = freshFoodList, state = "readonly") # create widget
-    FSfood.place(x = 240, y = 160)
+    FSfood.place(x = 240, y = 260)
     
     # calendar to select date bought
     FSlb2 = tk.Label(window1, text = "Enter date bought: ", font = ("Proxima Nova", 12)) # prompt
-    FSlb2.place(x = 60, y = 215)
+    FSlb2.place(x = 60, y = 315)
 
     FSdatebought = Calendar(window1)
-    FSdatebought.place(x = 240, y = 215)
+    FSdatebought.place(x = 240, y = 315)
 
     # done/insert button to finalise selection
     FSdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
-    FSdonebtn.place(x = 330, y = 410)
+    FSdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
 
@@ -132,31 +136,31 @@ def chooseNonFresh():
     #-------------USER INPUT WIDGETS---------------
     # name
     NFlb1 = tk.Label(window1, text = "Enter or scan for name:", font = ("Proxima Nova", 12)) # prompt
-    NFlb1.place(x = 60, y = 160)
+    NFlb1.place(x = 60, y = 260)
 
     NFname = tk.Entry(window1, bd = 3, width = 15) # entry box
-    NFname.place(x = 240, y = 160)
+    NFname.place(x = 240, y = 260)
 
     NFscanbtn = tk.Button(window1, text = "Scan", font = ("Proxima Nova", 12), command = scanCode) # scan button. link to scanning function with command = ...
-    NFscanbtn.place(x = 400, y = 165) 
+    NFscanbtn.place(x = 400, y = 265) 
 
     # location #######
     NFlb2 = tk.Label(window1, text = "Select location stored: ", font = ("Proxima Nova", 12)) # prompt
-    NFlb2.place(x = 60, y = 215)
+    NFlb2.place(x = 60, y = 315)
 
     NFloc = ttk.Combobox(window1, values = nonFreshFoodLocList, state = "readonly") # menu widget
-    NFloc.place(x = 240, y = 215)
+    NFloc.place(x = 240, y = 315)
 
     # expiry date
     NFlb3 = tk.Label(window1, text = "Enter expiry date:", font = ("Proxima Nova", 12)) # prompt
-    NFlb3.place(x = 60, y = 285)
+    NFlb3.place(x = 60, y = 385)
 
     NFexpirydate = Calendar(window1)
-    NFexpirydate.place(x = 240, y = 285)
+    NFexpirydate.place(x = 240, y = 385)
 
     # done button
     NFdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) 
-    NFdonebtn.place(x = 330, y = 550)
+    NFdonebtn.place(x = 330, y = 580)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
     # list of non-fresh widgets
@@ -186,21 +190,21 @@ def chooseLeftover():
     #-------------USER INPUT WIDGETS---------------
     # entry box to input name for leftovers
     LOlb1 = tk.Label(window1, text = "Enter leftover name:", font = ("Proxima Nova", 12)) # instructions
-    LOlb1.place(x = 60, y = 160)
+    LOlb1.place(x = 60, y = 260)
 
     LOname = tk.Entry(window1, bd = 3) # entry box
-    LOname.place(x = 240, y = 155)
+    LOname.place(x = 240, y = 255)
 
     # calendar to input date cooked
     LOlb2 = tk.Label(window1, text = "Select date cooked: ", font = ("Proxima Nova", 12)) # instructions
-    LOlb2.place(x = 60, y = 215)
+    LOlb2.place(x = 60, y = 315)
 
     LOdatecooked = Calendar(window1) # calendar
-    LOdatecooked.place(x = 240, y = 215)
+    LOdatecooked.place(x = 240, y = 315)
 
     # done button
     LOdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
-    LOdonebtn.place(x = 330, y = 410)
+    LOdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
     # list of widgets
@@ -232,21 +236,21 @@ def chooseFrozen():
     #-------------USER INPUT WIDGETS---------------
     # drop-down menu to select frozen food type
     FZlb1 = tk.Label(window1, text = "Select frozen food type:", font = ("Proxima Nova", 12)) # prompt
-    FZlb1.place(x = 60, y = 160)
+    FZlb1.place(x = 60, y = 260)
 
     FZfood = ttk.Combobox(window1, values = frozenFoodList, state = "readonly") # menu widget
-    FZfood.place(x = 240, y = 160)
+    FZfood.place(x = 240, y = 260)
 
     # calendar to input date frozen
     FZlb2 = tk.Label(window1, text = "Enter date frozen: ", font = ("Proxima Nova", 12)) # prompt
-    FZlb2.place(x = 60, y = 215)
+    FZlb2.place(x = 60, y = 315)
 
     FZdatefrozen = Calendar(window1)
-    FZdatefrozen.place(x = 240, y = 215)
+    FZdatefrozen.place(x = 240, y = 315)
 
     # done button
     FZdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
-    FZdonebtn.place(x = 330, y = 410)
+    FZdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
     # list of Frozen widgets
@@ -281,7 +285,7 @@ def scanCode():
     # Function to scan code for Packaged food
     print('SCANNED!')
 
-##-------------------------WHEN FOOD TYPE IS SELECTED (e.g. Fresh, Non-fresh)---------------------------------------
+##-------------------------AFTER FOOD TYPE IS SELECTED (e.g. Fresh, Non-fresh)---------------------------------------
 def foodInventoryInsert(): #########
     # Function that inserts entries into the food inventory. Called when insert button is clicked. Displays food,
     # best before date, how many dates until it expires
@@ -300,11 +304,11 @@ def foodInventoryInsert(): #########
 
     # Insert delete button to delete inventory insert
     deleteBtn = tk.Button(window1, text = "Delete", command = delInventoryEntry)
-    deleteBtn.place(x = 1310, y = 500)
+    deleteBtn.place(x = 1310, y = 600)
 
     # Insert find-a-recipe button now that at least one ingredient is added
     findARecipeBtn = tk.Button(window1, text = "Find a recipe!", command = recipepage)
-    findARecipeBtn.place(x = 1000, y = 550)
+    findARecipeBtn.place(x = 1000, y = 650)
     
     # for child in tree.get_children(): ####### potential way of iterating through items in tree?
     #     print(tree.item(child)["Values"])
@@ -322,11 +326,20 @@ def delInventoryEntry():
 ##-------------------------------------------------RECIPE PAGE------------------------------------------------------
 
 def recipepage():
-    # Called when findARecipeBtn is clicked
-    window2 = tk.Tk()
+    # Called when findARecipeBtn is clicked, creates new window for recipe page
+    window2 = tk.Toplevel()
     window2.title("Recipe Results")
     window2.geometry("1500x1500")
-    window2.mainloop()
+
+    # insert app logo
+    logo = Image.open("logo.png")
+    logo = logo.resize((150, 100))
+    logo = ImageTk.PhotoImage(image = logo)
+    RPlb1 = tk.Label(window2, image = logo) # label
+    RPlb1.place(x = 620, y = 20) # position label
+
     # ....
+    window2.mainloop()
+
 
 main()
