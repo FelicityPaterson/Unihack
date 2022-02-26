@@ -2,8 +2,8 @@ from contextlib import nullcontext
 from pyzbar import pyzbar
 from cv2 import cv2
 from bs4 import BeautifulSoup as BSoup
-
 import requests
+
 barcode_number = -1
 url = "https://au.openfoodfacts.org/cgi/search.pl?search_terms="
 
