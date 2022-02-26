@@ -281,7 +281,7 @@ def hideWidget(widgetList):
 
     return
 
-def scanCode():
+def scanCode(): #####
     # Function to scan code for Packaged food
     print('SCANNED!')
 
@@ -314,8 +314,8 @@ def foodInventoryInsert(): #########
     #     print(tree.item(child)["Values"])
     return
 
-def sortBy():
-    # Function to sort entries in tree by food name/best before date/days remaining ######
+def sortBy(): ######
+    # Function to sort entries in tree by food name/best before date/days remaining 
     pass
 
 def delInventoryEntry():
@@ -325,7 +325,7 @@ def delInventoryEntry():
 
 ##-------------------------------------------------RECIPE PAGE------------------------------------------------------
 
-def recipepage():
+def recipepage(): #####
     # Called when findARecipeBtn is clicked, creates new window for recipe page
     window2 = tk.Toplevel()
     window2.title("Recipe Results")
