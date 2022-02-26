@@ -1,3 +1,4 @@
+from cmath import rect
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup as BSoup
@@ -194,9 +195,20 @@ def get_servings(rcp_soup):
     return serves
 
 
+def check_pg_exists(rcp_soup):
+    error = rcp_soup.find("div", {"class":"template-error__header"})
+    if error:
+        return 0
+    else:
+        return 1
+
+
 def read_recipe(url):
     recipe_content = requests.get(url).text
     recipe_soup = BSoup(recipe_content, "html.parser")
+
+    if not check_pg_exists(recipe_soup):
+        return None
 
     ingredients = get_ingrds(recipe_soup)
     instructions = get_instrs(recipe_soup)
@@ -221,11 +233,25 @@ def run():
     recipe_links = get_all_rcp_urls()
     save_to_json(recipe_links, "recipe_urls.json")
     all_recipes = []
-    counter = 0
-    for link in recipe_links:
-        all_recipes.append(read_recipe(link))
-        counter += 1
-        print(f"{round(counter / 34.58, 2)}%")
+
+    with open("recipes.json") as file:
+        all_recipes = json.load(file)
+
+    for i in range(len(all_recipes), len(recipe_links)):
+        recipe = read_recipe(recipe_links[i])
+        if recipe == None:
+            continue
+        else:
+            all_recipes.append(recipe)
+
+    # for link in recipe_links:
+    #     recipe = read_recipe(link)
+    #     if recipe == None:
+    #         continue
+    #     else:
+    #         all_recipes.append(recipe)
+
+        print(len(all_recipes), f"{round(i / 34.58, 2)}%")
         save_to_json(all_recipes, "recipes.json")
 
 
