@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup as BSoup
 import math
@@ -33,10 +34,10 @@ def full_url(link_text):
 
 
 def save_to_json(object_to_save, filename):
-    json_urls = json.dumps(object_to_save, indent=2)
+    json_data = json.dumps(object_to_save, indent=2)
 
     json_file = open(filename, 'w')
-    json_file.write(json_urls)
+    json_file.write(json_data)
     json_file.close()
 
     return True
@@ -54,7 +55,6 @@ def get_all_rcp_urls():
             r = json.load(file)
 
         if len(r) + 1 >= recipe_num:
-            print("EXIT")
             # if recipes number in the file is less than the current,
             # then redo the entire list.
             return r
@@ -97,7 +97,11 @@ def get_instrs(rcp_soup):
     instructions = []
 
     for item in instruction_section.ul:
-        instructions.append(item.p.text)
+        if item.p:
+            instructions.append(item.p.text)
+        else:
+            instructions.append(item.text)
+
 
     return instructions
 
@@ -108,8 +112,10 @@ def get_tips(rcp_soup):
     if not tips_section:
         return tips
 
+    if not tips_section.next_sibling:
+        return tips
     for sib in tips_section.next_siblings:
-        tips.append(sib.p.text)
+        tips.append(sib.text)
 
 
 def get_rcp_name(rcp_soup):
@@ -127,36 +133,104 @@ def get_rating(rcp_soup):
 
 
 def parse_duration(datetime_str):
-    print(datetime_str)
-    print(re.search("[0-9]*H", datetime_str))
+    hours = re.search("([0-9]*)H", datetime_str)
+    if hours:
+        hours = int(hours.group(1))
+    else:
+        hours = 0
+
+    minutes = re.search("([0-9]*)M", datetime_str)
+    if minutes:
+        minutes = int(minutes.group(1))
+    else:
+        minutes = 0
+
+    seconds = re.search("([0-9]*)S", datetime_str)
+    if seconds:
+        seconds = int(seconds.group(1))
+    else:
+        seconds = 0
+
+    return hours, minutes, seconds
 
 
 def get_cook_time(rcp_soup):
     time_section = rcp_soup.find_all("time")
-    # total_time = time_section.get("datetime")
-    time1 = time_section[0].get("datetime")
-    parse_duration(time1)
+    days, hours, minutes, seconds = 0, 0, 0, 0
+    for time in time_section:
+        time = time.get("datetime")
+        h, m, s = parse_duration(time)
+        hours += h
+        minutes += m
+        seconds += s
+    
+    minutes += seconds // 60
+    seconds = seconds % 60
+    hours += minutes // 60
+    minutes = minutes % 60
+    days = hours // 24
+    hours = hours % 24
+
+    time_dict = {"days": days,
+                 "hours": hours,
+                 "minutes": minutes,
+                 "seconds": seconds
+                 }
+
+    return time_dict
+
+
+def get_servings(rcp_soup):
+    serving_section = rcp_soup.find("div", {"class":"post-header__servings"})
+    if not serving_section:
+        return -1
+
+    serves = serving_section.find("div", {"class":"icon-with-text__children"}).text
+    serves = re.search("[0-9]+", serves)
+    if serves:
+        serves = int(serves.group(0))
+    else:
+        serves = -1
+    return serves
 
 
 def read_recipe(url):
     recipe_content = requests.get(url).text
     recipe_soup = BSoup(recipe_content, "html.parser")
+
     ingredients = get_ingrds(recipe_soup)
     instructions = get_instrs(recipe_soup)
     tips = get_tips(recipe_soup)
     name = get_rcp_name(recipe_soup)
     rating = get_rating(recipe_soup)
     time = get_cook_time(recipe_soup)
-    return ingredients, instructions
+    servings = get_servings(recipe_soup)
+
+    recipe = {"title": name,
+              "rating": rating,
+              "duration": time,
+              "servings": servings,
+              "ingredients": ingredients,
+              "instructions": instructions,
+              "tips": tips
+              }
+    return recipe
 
 
 def run():
     recipe_links = get_all_rcp_urls()
     save_to_json(recipe_links, "recipe_urls.json")
-    ingrds, instrcs = read_recipe(recipe_links[17])
-
-
+    all_recipes = []
+    counter = 0
+    for link in recipe_links:
+        all_recipes.append(read_recipe(link))
+        counter += 1
+        print(f"{round(counter / 34.58, 2)}%")
+        save_to_json(all_recipes, "recipes.json")
 
 
 if __name__ == "__main__":
     run()
+
+
+
