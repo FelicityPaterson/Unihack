@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from PIL import ImageTk, Image
 from cmath import rect
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup as BSoup
 import math
@@ -454,12 +454,12 @@ def chooseFresh():
     # create fresh food list
     global freshFoodList
     global FSdatebought
+    global FSfood
     #-------------USER INPUT WIDGETS---------------
     # drop-down menu to select fresh food type
     FSlb1 = tk.Label(window1, text = "Select Fresh food:", font = ("Proxima Nova", 12)) # instructions
     FSlb1.place(x = 60, y = 260)
 
-    global FSfood
     FSfood = ttk.Combobox(window1, values = freshFoodList, state = "readonly") # create widget
     FSfood.place(x = 240, y = 260)
     
@@ -468,15 +468,12 @@ def chooseFresh():
     FSlb2 = tk.Label(window1, text = "Enter date bought: ", font = ("Proxima Nova", 12)) # prompt
     FSlb2.place(x = 60, y = 315)
 
-    FSdatebought = Calendar(window1)
-    
+    FSdatebought = Calendar(window1, date_pattern = "dd/MM/yyyy")
     FSdatebought.place(x = 240, y = 315)
    
-    print("-------------------------------------")
-    print(FSdatebought.get_date())
-    print("-------------------------------------")
+
     # done/insert button to finalise selection
-    FSdonebtn = tk.Button(window1, text = "Insert", command = freshFoodData(FSfood.get(), FSdatebought.get_date())) #####
+    FSdonebtn = tk.Button(window1, text = "Insert", command = lambda : freshFoodData(FSfood.get(), FSdatebought.get_date())) #####
     FSdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
@@ -502,17 +499,14 @@ def chooseFresh():
     return
 
 def freshFoodData(name, date):
-    print("-------------------------------------")
-    print(date)
-    print("-------------------------------------")
     i = 0
     timedays = 3
     while i < len(freshFoodList):
         if name == freshFoodList[i]:
-            timedays = freshFoodLengthDay[i]
+            timedays = int(freshFoodLengthDay[i])
         i += 1
     dateVar = stringToDate(date)
-    expiry = dateToString((dateVar + datetime.timedelta(days=timedays)))
+    expiry = dateToString((dateVar + timedelta(days=timedays)))
     storeValues(name,expiry,'Fresh','Fridge')
 
 def chooseNonFresh():
@@ -532,6 +526,7 @@ def chooseNonFresh():
     global NFname
     NFname = tk.Entry(window1, bd = 3, width = 15) # entry box
     NFname.place(x = 240, y = 260)
+
     
     # location #######
     NFlb2 = tk.Label(window1, text = "Select location stored: ", font = ("Proxima Nova", 12)) # prompt
@@ -548,7 +543,7 @@ def chooseNonFresh():
     NFexpirydate.place(x = 240, y = 385)
 
     # done button
-    NFdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) 
+    NFdonebtn = tk.Button(window1, text = "Insert", command = lambda : nonFreshFoodData(NFname.get(), NFexpirydate.get_date(),NFloc.get())) 
     NFdonebtn.place(x = 330, y = 580)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
@@ -571,6 +566,9 @@ def chooseNonFresh():
         pass
 
     return
+def nonFreshFoodData(name, date,location):
+    
+    storeValues(name,date,'NonFresh',location)
 
 def chooseLeftover():
     # Function run when Leftover option of radiobuttons selected. Creates relevant widgets; name to give leftovers
@@ -588,11 +586,11 @@ def chooseLeftover():
     LOlb2 = tk.Label(window1, text = "Select date cooked: ", font = ("Proxima Nova", 12)) # instructions
     LOlb2.place(x = 60, y = 315)
 
-    LOdatecooked = Calendar(window1) # calendar
+    LOdatecooked = Calendar(window1, date_pattern = "dd/MM/yyyy") # calendar
     LOdatecooked.place(x = 240, y = 315)
 
     # done button
-    LOdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
+    LOdonebtn = tk.Button(window1, text = "Insert", command = lambda : leftoverData(LOname.get(), LOdatecooked.get_date())) #####
     LOdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
@@ -616,6 +614,11 @@ def chooseLeftover():
 
     return
 
+def leftoverData(name,date):
+    dateVar = stringToDate(date)
+    expiry = dateToString((dateVar + timedelta(days=3)))
+    storeValues(name,expiry,'Leftovers','Fridge')
+
 def chooseFrozen():
     # Function run when Frozen option of radiobuttons selected. Creates relevant widgets; type of frozen food and
     # date food was first frozen.
@@ -634,11 +637,11 @@ def chooseFrozen():
     FZlb2 = tk.Label(window1, text = "Enter date frozen: ", font = ("Proxima Nova", 12)) # prompt
     FZlb2.place(x = 60, y = 315)
 
-    FZdatefrozen = Calendar(window1)
+    FZdatefrozen = Calendar(window1, date_pattern = "dd/MM/yyyy")
     FZdatefrozen.place(x = 240, y = 315)
 
     # done button
-    FZdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
+    FZdonebtn = tk.Button(window1, text = "Insert", command = lambda : frozenData(FZfood.get(), FZdatefrozen.get_date())) #####
     FZdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
@@ -662,6 +665,16 @@ def chooseFrozen():
 
     return
 
+def frozenData(name,date):
+    i = 0
+    timemonths = 3 
+    date = stringToDate(date)
+    while i < len(frozenFoodList):
+        if name == frozenFoodList[i]:
+            timemonths = int(frozenFoodLengthMonth[i])
+        i += 1
+    expiry = dateToString((date + timedelta(days=30*timemonths)))
+    storeValues(name,expiry,'Frozen','Freezer')
 
 def hideWidget(widgetList):
     # Function called to hide widgets from other food types. Accepts a list of tk widgets.
