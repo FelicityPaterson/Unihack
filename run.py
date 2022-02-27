@@ -1,7 +1,7 @@
 # from ctypes import alignment
 import tkinter as tk # import tkinter library
 from tkinter import ttk
-from tkcalendar import Calendar
+from tkcalendar import Calendar, DateEntry
 from PIL import ImageTk, Image
 from cmath import rect
 from datetime import datetime
@@ -14,6 +14,11 @@ import re
 from contextlib import nullcontext
 from pyzbar import pyzbar
 from cv2 import cv2
+from twilio.rest import Client
+
+account_sid = "ACff8ab1fefd1fb3ce487325457522a330"
+auth_token = "173d51f33714563d28a12e1554308331"
+client = Client(account_sid, auth_token)
 
 barcode_number = -1
 url = "https://au.openfoodfacts.org/cgi/search.pl?search_terms="
@@ -36,7 +41,7 @@ def send_sms(food, storage, date):
          body=f'The {food} in your {storage} has a best before of {date}.' + \
                '\nCheck out the app to see what recipes you can cook with it.',
          from_='+19034803993',
-         to='+61435735171'
+         to='+61435072202'
      )
 
     print(message.sid)
@@ -292,7 +297,7 @@ def runRecipeScraper():
 
 
 def stringToDate(dateString):
-    date_object = datetime.datetime.strptime(dateString, '%d/%m/%Y').date()
+    date_object = datetime.strptime(dateString, '%d/%m/%Y').date()
     return date_object
 
 def dateToString(dateObject):
@@ -377,7 +382,6 @@ def main():
     window1 = tk.Tk()
     window1.title("Best Before") # name title of window
     window1.geometry("1500x1500") # window size
-
     # insert app logo
     logo = Image.open("logo.png")
     logo = logo.resize((150, 100))
@@ -429,14 +433,14 @@ def main():
     tree.heading("Best before", text = "Best before")
     tree.heading("Days remaining", text = "Days remaining")
     tree.place(x = 750, y = 215) # place tree
-
+    # send_sms('milk', 'fridge', '02/03/2022')
     #----------------------------------------RECIPE PAGE-------------------------------------------------------
 
 
     #------
     # run the window
     window1.mainloop() 
-    send_sms('milk', 'fridge', '02/03/2022')
+    
 
     return
 
@@ -449,6 +453,7 @@ def chooseFresh():
 
     # create fresh food list
     global freshFoodList
+    global FSdatebought
     #-------------USER INPUT WIDGETS---------------
     # drop-down menu to select fresh food type
     FSlb1 = tk.Label(window1, text = "Select Fresh food:", font = ("Proxima Nova", 12)) # instructions
@@ -458,15 +463,20 @@ def chooseFresh():
     FSfood = ttk.Combobox(window1, values = freshFoodList, state = "readonly") # create widget
     FSfood.place(x = 240, y = 260)
     
+    
     # calendar to select date bought
     FSlb2 = tk.Label(window1, text = "Enter date bought: ", font = ("Proxima Nova", 12)) # prompt
     FSlb2.place(x = 60, y = 315)
 
     FSdatebought = Calendar(window1)
+    
     FSdatebought.place(x = 240, y = 315)
-
+   
+    print("-------------------------------------")
+    print(FSdatebought.get_date())
+    print("-------------------------------------")
     # done/insert button to finalise selection
-    FSdonebtn = tk.Button(window1, text = "Insert", command = foodInventoryInsert) #####
+    FSdonebtn = tk.Button(window1, text = "Insert", command = freshFoodData(FSfood.get(), FSdatebought.get_date())) #####
     FSdonebtn.place(x = 330, y = 510)
 
     #-------------HIDE WIDGETS FROM OTHER FOOD TYPES---------------
@@ -490,6 +500,20 @@ def chooseFresh():
         pass
 
     return
+
+def freshFoodData(name, date):
+    print("-------------------------------------")
+    print(date)
+    print("-------------------------------------")
+    i = 0
+    timedays = 3
+    while i < len(freshFoodList):
+        if name == freshFoodList[i]:
+            timedays = freshFoodLengthDay[i]
+        i += 1
+    dateVar = stringToDate(date)
+    expiry = dateToString((dateVar + datetime.timedelta(days=timedays)))
+    storeValues(name,expiry,'Fresh','Fridge')
 
 def chooseNonFresh():
     # TO BE CHANGED. Function run when Packaged option of radiobuttons selected. Creates relevant widgets; prompt for 
@@ -597,7 +621,7 @@ def chooseFrozen():
     # date food was first frozen.
 
     global frozenFoodList
-
+    
     #-------------USER INPUT WIDGETS---------------
     # drop-down menu to select frozen food type
     FZlb1 = tk.Label(window1, text = "Select frozen food type:", font = ("Proxima Nova", 12)) # prompt
@@ -657,6 +681,7 @@ def foodInventoryInsert(): #########
     
     # inventoryList = []
     # inventoryList.append()
+    print(FSdatebought.get_date())
 
     if v1.get() == "Fresh":
         tree.insert("", index = "end", values = (FSwidgets[0].get(), "", "")) ######

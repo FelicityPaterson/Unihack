@@ -302,6 +302,11 @@ def storeValues(Name, Expiry, Category, Location):
     with open("food.json", "w") as write_file:
         json.dump(food, write_file)
     write_file.close()
+    #UPDATE FOOD LIST ON SIDE
+    #READVALUES
+    #^ TO UPDATE FOOD[]
+    # HAVE VARIABLE FOR SORT TYPE (i.e 1= ALPHABETICAL)
+    # INSERT THINGS IN TREE
 
 def readValues():
     with open("food.json", "r") as read_file:
