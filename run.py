@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from PIL import ImageTk, Image
 from cmath import rect
-from datetime import datetime, timedelta
+from datetime import *
 import requests
 from bs4 import BeautifulSoup as BSoup
 import math
@@ -304,12 +304,16 @@ def dateToString(dateObject):
     date_time = dateObject.strftime("%d/%m/%Y")
     return date_time
 
+def get_days_to_expiry(date):
+    date = stringToDate(date)
+    return (date - date.today()).days
+
 def storeValues(Name, Expiry, Category, Location):
     print("store: {0}, {1}, {2}, {3}".format(Name,Expiry,Category,Location))
-    object = {'name': Name, 'expiry': Expiry, 'category': Category, 'location': Location }
+    object = {'name': Name.title(), 'expiry': Expiry.title(), 'category': Category.title(), 'location': Location.title() }
     food.append(object)
     with open("food.json", "w") as write_file:
-        json.dump(food, write_file)
+        json.dump(food, write_file,indent=2)
     write_file.close()
 
 def readValues():
@@ -429,10 +433,11 @@ def main():
     # defining tree view 
     global tree
     tree = ttk.Treeview(window1, columns = ("Food", "Best before", "Days remaining"), show = "headings", height = 20)
-    tree.heading("Food", text = "Food", command = sortBy) # set heading names
-    tree.heading("Best before", text = "Best before")
-    tree.heading("Days remaining", text = "Days remaining")
+    tree.heading("Food", text = "Food", command = lambda : sortBy(1)) # set heading names
+    tree.heading("Best before", text = "Best before", command = lambda : sortBy(2))
+    tree.heading("Days remaining", text = "Days remaining", command = lambda : sortBy(2))
     tree.place(x = 750, y = 215) # place tree
+    foodInventoryInsert()
     # send_sms('milk', 'fridge', '02/03/2022')
     #----------------------------------------RECIPE PAGE-------------------------------------------------------
 
@@ -508,6 +513,7 @@ def freshFoodData(name, date):
     dateVar = stringToDate(date)
     expiry = dateToString((dateVar + timedelta(days=timedays)))
     storeValues(name,expiry,'Fresh','Fridge')
+    foodInventoryInsert()
 
 def chooseNonFresh():
     # TO BE CHANGED. Function run when Packaged option of radiobuttons selected. Creates relevant widgets; prompt for 
@@ -569,6 +575,7 @@ def chooseNonFresh():
 def nonFreshFoodData(name, date,location):
     
     storeValues(name,date,'NonFresh',location)
+    foodInventoryInsert()
 
 def chooseLeftover():
     # Function run when Leftover option of radiobuttons selected. Creates relevant widgets; name to give leftovers
@@ -618,6 +625,7 @@ def leftoverData(name,date):
     dateVar = stringToDate(date)
     expiry = dateToString((dateVar + timedelta(days=3)))
     storeValues(name,expiry,'Leftovers','Fridge')
+    foodInventoryInsert()
 
 def chooseFrozen():
     # Function run when Frozen option of radiobuttons selected. Creates relevant widgets; type of frozen food and
@@ -675,6 +683,7 @@ def frozenData(name,date):
         i += 1
     expiry = dateToString((date + timedelta(days=30*timemonths)))
     storeValues(name,expiry,'Frozen','Freezer')
+    foodInventoryInsert()
 
 def hideWidget(widgetList):
     # Function called to hide widgets from other food types. Accepts a list of tk widgets.
@@ -691,19 +700,9 @@ def scanCode(): #####
 def foodInventoryInsert(): #########
     # Function that inserts entries into the food inventory. Called when insert button is clicked. Displays food,
     # best before date, how many dates until it expires
-    
-    # inventoryList = []
-    # inventoryList.append()
-    print(FSdatebought.get_date())
-
-    if v1.get() == "Fresh":
-        tree.insert("", index = "end", values = (FSwidgets[0].get(), "", "")) ######
-    elif v1.get() == "Packaged":
-        tree.insert("", index = "end", values = (NFwidgets[0].get(), "", "")) ######### CHANGE TO ACCOMODATE SCANNER TOO
-    elif v1.get() == "Leftovers":
-        tree.insert("", index = "end", values = (LOwidgets[0].get(), "", "")) ######
-    elif v1.get() == "Frozen":
-        tree.insert("", index = "end", values = (FZwidgets[0].get(), "", "")) ######
+    delTreedata()
+    for i in food:
+        tree.insert("", index = "end", values = (i['name'],i['expiry'],get_days_to_expiry(i['expiry'])))
 
     # Insert delete button to delete inventory insert
     deleteBtn = tk.Button(window1, text = "Delete", command = delInventoryEntry)
@@ -717,14 +716,23 @@ def foodInventoryInsert(): #########
     #     print(tree.item(child)["Values"])
     return
 
-def sortBy(): ######
+def sortBy(type): ######
     # Function to sort entries in tree by food name/best before date/days remaining 
-    pass
+    delTreedata()
+    foodInventoryInsert()
+    if type == 1:
+        food.sort(key=lambda x: x["name"]) 
+    elif type == 2:
+        food.sort(key=lambda x: stringToDate(x["expiry"])) 
 
 def delInventoryEntry():
     # Function to delete entries in tree with 'Delete' button
     tree.delete(tree.selection())
     return
+
+def delTreedata():
+    for i in tree.get_children():
+        tree.delete(i)
 
 ##-------------------------------------------------RECIPE PAGE------------------------------------------------------
 
