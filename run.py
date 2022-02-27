@@ -304,6 +304,10 @@ def dateToString(dateObject):
     date_time = dateObject.strftime("%d/%m/%Y")
     return date_time
 
+def get_days_to_expiry(date):
+    date = stringToDate(date)
+    return (date - date.today()).days
+
 def storeValues(Name, Expiry, Category, Location):
     print("store: {0}, {1}, {2}, {3}".format(Name,Expiry,Category,Location))
     object = {'name': Name.title(), 'expiry': Expiry.title(), 'category': Category.title(), 'location': Location.title() }
@@ -698,7 +702,7 @@ def foodInventoryInsert(): #########
     # best before date, how many dates until it expires
     
     for i in food:
-        tree.insert("", index = "end", values = (i['name'],i['expiry'],"daysremaining"))
+        tree.insert("", index = "end", values = (i['name'],i['expiry'],get_days_to_expiry(i['expiry'])))
 
     # Insert delete button to delete inventory insert
     deleteBtn = tk.Button(window1, text = "Delete", command = delInventoryEntry)
