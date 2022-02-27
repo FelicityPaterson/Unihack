@@ -700,7 +700,7 @@ def scanCode(): #####
 def foodInventoryInsert(): #########
     # Function that inserts entries into the food inventory. Called when insert button is clicked. Displays food,
     # best before date, how many dates until it expires
-    
+    delTreedata()
     for i in food:
         tree.insert("", index = "end", values = (i['name'],i['expiry'],get_days_to_expiry(i['expiry'])))
 
