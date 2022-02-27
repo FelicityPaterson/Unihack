@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "name": "Kiwi Fruit",
+    "expiry": "10/03/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Plum",
+    "expiry": "28/02/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Broccoli",
+    "expiry": "28/03/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Mushrooms",
+    "expiry": "14/07/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Cold Meats",
+    "expiry": "31/05/2022",
+    "category": "Frozen",
+    "location": "Freezer"
+  }
+]
