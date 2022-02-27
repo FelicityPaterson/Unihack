@@ -29,6 +29,18 @@ with open("food.json", "r") as read_file:
     data = json.load(read_file)
 food = data
 
+def send_sms(food, storage, date):
+
+    message = client.messages \
+    .create(
+         body=f'The {food} in your {storage} has a best before of {date}.' + \
+               '\nCheck out the app to see what recipes you can cook with it.',
+         from_='+19034803993',
+         to='+61435735171'
+     )
+
+    print(message.sid)
+
 
 def get_rcp_from_page(soup, links_ls):
     recipes = soup.find_all("a", {"class":"standard-card-new__article-title"})
@@ -424,6 +436,7 @@ def main():
     #------
     # run the window
     window1.mainloop() 
+    send_sms('milk', 'fridge', '02/03/2022')
 
     return
 
