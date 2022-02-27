@@ -326,7 +326,7 @@ def get_best_recipes(expire_info):
     with open('recipes.json', 'r') as f:
         recipes = json.load(f)
 
-    for i in range(0,100):
+    for i in range(0,len(recipes)):
         score = 0
         for item in expire_info:
             food = item[0]
@@ -425,6 +425,7 @@ def decode(image):
     return image
 
 def main():
+    # get_best_recipes(get_expiring_foods())
     # Main function to start app
 
     # create a window to ADD INGREDIENTS and view FOOD AT HOME
@@ -591,7 +592,7 @@ def chooseNonFresh():
     NFlb3 = tk.Label(window1, text = "Enter expiry date:", font = ("Proxima Nova", 12)) # prompt
     NFlb3.place(x = 60, y = 385)
 
-    NFexpirydate = Calendar(window1)
+    NFexpirydate = Calendar(window1, date_pattern = "dd/MM/yyyy")
     NFexpirydate.place(x = 240, y = 385)
 
     # done button
@@ -782,8 +783,13 @@ def delTreedata():
 
 ##-------------------------------------------------RECIPE PAGE------------------------------------------------------
 
+recipecount = 0
+
 def recipepage(): #####
     # Called when findARecipeBtn is clicked, creates new window for recipe page
+    global recipecount
+    global window2
+
     window2 = tk.Toplevel()
     window2.title("Recipe Results")
     window2.geometry("1500x1500")
@@ -795,8 +801,74 @@ def recipepage(): #####
     RPlb1 = tk.Label(window2, image = logo) # label
     RPlb1.place(x = 620, y = 20) # position label
 
-    # ....
+    best_recipes = get_best_recipes(get_expiring_foods())
+    curr_recipe = best_recipes[recipecount]
+    if not curr_recipe:
+        title, rating, duration, serving = 'None'
+        ingrds, tips, instructions = ['None']
+    
+    title = curr_recipe['title']
+    rating = int(curr_recipe['rating'])
+    duration = str(curr_recipe['duration']['hours']) + " hour(s) " + \
+               str(curr_recipe['duration']['minutes']) + " min(s)"
+    serving = curr_recipe['servings']
+    ingrds = curr_recipe["ingredients"]
+    tips = curr_recipe['tips']
+    instructions = curr_recipe['instructions']
+
+    # insert recipe
+    formatRecipe(recipecount, title,rating, duration, serving, ingrds, tips, instructions) 
+    recipecount = (recipecount + 1) % 10
+
+    # next recipe
+    nextBtn = tk.Button(window2, text = "Next", command = recipepage)
+    nextBtn.place(x = 1300, y = 160)
+
     window2.mainloop()
 
+    return
+
+def formatRecipe(count, title, rating, duration, servings, ingredients, tips, instr):
+    # Function to format recipe
+
+    # title
+    titlelbl = tk.Label(window2, text = f"{title}", font = ("Prixima Nova", 30, "bold")) # label
+    titlelbl.pack(side = "top", pady = 150) # position label
+
+    # recipe count
+    recipeCountlbl = tk.Label(window2, text = f"Recipe {count+1}", font = ("Arial Bold", 16), fg = "white", bg = "orange")
+    recipeCountlbl.place(x = 120, y = 160)
+
+    # ratings
+    ratinglbl = tk.Label(window2, text = f"Rating: {rating} / 5", font = ("Proxima Nova", 16, "bold")) # label
+    ratinglbl.place(x = 120, y = 240) # position label
+
+    # duration
+    durationlbl = tk.Label(window2, text = f"Duration: {duration}", font = ("Proxima Nova", 16, "bold")) # label
+    durationlbl.place(x = 120, y = 280) # position label
+
+    # servings
+    servinglbl = tk.Label(window2, text = f"Serving: {servings}", font = ("Proxima Nova", 16, "bold")) # label
+    servinglbl.place(x = 120, y = 320) # position label
+
+    # ingredients
+    ingrtlbl = tk.Label(window2, text = f"Ingredient", font = ("Arial Bold", 16), fg = "white", bg = "#ABBD5C") # label
+    ingrtlbl.place(x = 120, y = 400) # position label
+
+    ingrtList = tk.Label(window2, text = '\n'.join(ingredients), font = ("Proxima Nova", 12))
+    ingrtList.place(x = 120, y = 435, width = 400) # position label
+
+    # instructions
+    stepslbl = tk.Label(window2, text = f"Steps / Instructions", font = ("Arial Bold", 16), fg = "white", bg = "#ABBD5C") # label
+    stepslbl.place(x = 650, y = 240) # position label
+
+    stepsList = tk.Text(window2, font = ("Proxima Nova", 12))
+    stepsList.insert(1.0, '- ' + '\n- '.join(instr))
+    # stepsList.config(state = DISABLED)
+    stepsList.place(x = 650, y = 300, width = 600)
+    
+    # tips
+    tipslbl = tk.Label(window2, text = f"{tips}", font = ("Proxima Nova", 12, "italic")) # label
+    tipslbl.place(x = 650, y = 280) # position label
 
 main()

@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "name": "Potato",
+    "expiry": "28/02/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Mango",
+    "expiry": "09/03/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Mango",
+    "expiry": "10/03/2022",
+    "category": "Fresh",
+    "location": "Fridge"
+  },
+  {
+    "name": "Fish",
+    "expiry": "28/02/2022",
+    "category": "Nonfresh",
+    "location": "Fridge"
+  }
+]
